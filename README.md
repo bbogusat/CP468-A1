@@ -21,7 +21,7 @@ From our complete state diagram there are 4 different routes to reach the goal s
 ## Implementation
 Solution will be written in Python 3.4 (?)
 
-### Code sections
-- Breadth-first search
+### Code Sections
+- Tree Class
+- Breadth-first search  
 - Layout of the problem 
-- 
