@@ -1,18 +1,20 @@
 import copy
+import collections
 
 class State:
 
     def __init__(self, missi_left, carni_left,
-                missi_right, carni_right, boat_pos):
+                missi_right, carni_right, boat_pos, path_taken):
          self.missi_left = missi_left
          self.carni_left = carni_left
          self.missi_right = missi_right
          self.carni_right = carni_right
          self.boat_pos = boat_pos
+         self.path_taken = path_taken
 
     def is_success(self):
         # Success if all have been moved to right side
-        if self.missi_left == 0 and self.carni_left == 0:
+        if self.missi_left == 0 and self.carni_left == 0 and self.missi_right > 0 and self.carni_right > 0:
             return True
         else:
             return False
@@ -40,35 +42,46 @@ class State:
         "C\nRight: "+str(self.missi_right)+"M , " +str(self.carni_right)+"C"
         +" boat pos: "+self.boat_pos+ "\n")
 
-def move_one(cur_state,who):
+    def to_string(self):
+        state_def = str("Left: "+str(self.missi_left)+"M , " +str(self.carni_left)+
+        "C\nRight: "+str(self.missi_right)+"M , " +str(self.carni_right)+"C"
+        +" boat pos: "+self.boat_pos+ "\n")
+        return state_def
+    def get_path(self):
+        for nodes in self.path_taken:
+            print(nodes.to_string())
+        return None
 
+
+def move_one(cur_state,who):
+    cur_state.path_taken.append(cur_state)
     if cur_state.boat_pos == "left":
         if who == "missi":
             new_state = State(cur_state.missi_left-1,cur_state.carni_left,
                                 cur_state.missi_right+1,cur_state.carni_right,
-                                "right")
+                                "right",cur_state.path_taken)
             print("Sent 1M right")
         else:
             new_state = State(cur_state.missi_left,cur_state.carni_left-1,
                                 cur_state.missi_right,cur_state.carni_right+1,
-                                "right")
+                                "right",cur_state.path_taken)
             print("Sent 1C right")
     else:
         if who == "missi":
             new_state = State(cur_state.missi_left+1,cur_state.carni_left,
                                 cur_state.missi_right-1,cur_state.carni_right,
-                                "left")
+                                "left",cur_state.path_taken)
             print("Sent 1M left")
         else:
             new_state = State(cur_state.missi_left,cur_state.carni_left+1,
                                 cur_state.missi_right,cur_state.carni_right-1,
-                                "left")
+                                "left",cur_state.path_taken)
             print("Sent 1C left")
     return new_state
 
 
 def move_two(cur_state,who1,who2):
-
+    cur_state.path_taken.append(cur_state)
     new_boat_pos = ""
     sent = [0,0]
     if cur_state.boat_pos == "left":
@@ -76,46 +89,46 @@ def move_two(cur_state,who1,who2):
         if who1 == "missi":
             new_state = State(cur_state.missi_left-1,cur_state.carni_left,
                                 cur_state.missi_right+1,cur_state.carni_right,
-                                new_boat_pos)
+                                new_boat_pos,cur_state.path_taken)
             sent[0] += 1
         else:
             new_state = State(cur_state.missi_left,cur_state.carni_left-1,
                                 cur_state.missi_right,cur_state.carni_right+1,
-                                new_boat_pos)
+                                new_boat_pos,cur_state.path_taken)
             sent[1] += 1
 
         if who2 == "missi":
             new_state = State(new_state.missi_left-1,new_state.carni_left,
                                 new_state.missi_right+1,new_state.carni_right,
-                                new_boat_pos)
+                                new_boat_pos,cur_state.path_taken)
             sent[0] += 1
         else:
             new_state = State(new_state.missi_left,new_state.carni_left-1,
                                 new_state.missi_right,new_state.carni_right+1,
-                                new_boat_pos)
+                                new_boat_pos,cur_state.path_taken)
             sent[1] += 1
     else:
         new_boat_pos = "left"
         if who1 == "missi":
             new_state = State(cur_state.missi_left+1,cur_state.carni_left,
                                 cur_state.missi_right-1,cur_state.carni_right,
-                                new_boat_pos)
+                                new_boat_pos,cur_state.path_taken)
             sent[0] += 1
         else:
             new_state = State(cur_state.missi_left,cur_state.carni_left+1,
                                 cur_state.missi_right,cur_state.carni_right-1,
-                                new_boat_pos)
+                                new_boat_pos,cur_state.path_taken)
             sent[1] += 1
 
         if who2 == "missi":
             new_state = State(new_state.missi_left+1,new_state.carni_left,
                                 new_state.missi_right-1,new_state.carni_right,
-                                new_boat_pos)
+                                new_boat_pos,cur_state.path_taken)
             sent[0] += 1
         else:
             new_state = State(new_state.missi_left,new_state.carni_left+1,
                                 new_state.missi_right,new_state.carni_right-1,
-                                new_boat_pos)
+                                new_boat_pos,cur_state.path_taken)
             sent[1] += 1
 
     print("Sent "+str(sent[0])+"M , "+ str(sent[1])+"C - " +new_boat_pos)
@@ -124,64 +137,61 @@ def move_two(cur_state,who1,who2):
 
 def solve(cur_state, explored):
     #Moving when unable. need to make sure there are people there to move
-    cur_state.print_state()
-    if not cur_state.valid_state() or cur_state in explored:
-        # If the state isn't valid (invalid move) then move up a node.
-        return -1
-
-    explored.append(cur_state)
 
     if cur_state.is_success():
         # No need to explore further the conditions are met
-        return explored
+        cur_state.path_taken.append(cur_state)
+        return cur_state
+    cur_state.print_state()
+    if not cur_state.valid_state() or cur_state in explored:
+        # If the state isn't valid (invalid move) then move up a node.
+        return None
+
+    explored.append(cur_state)
+
+    #path taken. - the current state is going to have to hold path taken
+    # If success return current state.
+    # Append current state
 
     # Will return explored on success, will return the next node if not
-    path1 = solve(move_one(cur_state,"missi"),copy.deepcopy(explored))
-    if path1 == -1:
-        print("Bad path Restarting----\n")
-        cur_state.print_state()
-    path2 = solve(move_one(cur_state,"carni"),copy.deepcopy(explored))
-    if path2 == -1:
-        print("Bad path Restarting----\n")
-        cur_state.print_state()
-    path3 = solve(move_two(cur_state,"missi","missi"),copy.deepcopy(explored))
-    if path3 == -1:
-        print("Bad path Restarting STARTING 4----\n")
-        cur_state.print_state()
+    path1 = solve(move_one(copy.deepcopy(cur_state),"missi"),copy.deepcopy(explored))
+    path2 = solve(move_one(copy.deepcopy(cur_state),"carni"),copy.deepcopy(explored))
+    path3 = solve(move_two(copy.deepcopy(cur_state),"missi","missi"),copy.deepcopy(explored))
 
-    path4 = solve(move_two(cur_state,"missi","carni"),copy.deepcopy(explored))
-    if path4 == -1:
-        print("Bad path Restarting----\n")
-        cur_state.print_state()
-    path5 = solve(move_two(cur_state,"carni","carni"),copy.deepcopy(explored))
-    if path5 == -1:
-        print("Bad path Restarting----\n")
-        cur_state.print_state()
+    path4 = solve(move_two(copy.deepcopy(cur_state),"missi","carni"),copy.deepcopy(explored))
+    path5 = solve(move_two(copy.deepcopy(cur_state),"carni","carni"),copy.deepcopy(explored))
 
+    #Path 1 holds the next state.
     paths = [path1,path2,path3,path4,path5]
     good_paths = []
     for path in paths:
-        if path != -1 and len(path) != 0:
-            good_paths.append(path)
+        if path is not None:
+            if type(path) is not list:
+                good_paths.append(path)
+            else:
+                for p in path:
+                    good_paths.append(p)
 
     if len(good_paths) == 0:
-        return -1
+        return None
 
     return good_paths
 
+
+
+
 def main():
 
-    initial_state = State(3,3,0,0,"left")
+    initial_state = State(3,3,0,0,"left",[])
     explored = []
+    print("Solving . . . \n")
     results = solve(initial_state,explored)
-    print("Done\n")
 
-    ans = results[0][0][0][0][0][0][0][0][0][0][0]
-
-    for res in ans:
-        res.print_state()
-
-
+    count = 1
+    for res in results:
+        print("\nSolution #"+str(count)+":\n----------------------------------")
+        res.get_path()
+        count += 1
 
 
 if __name__ == "__main__":
