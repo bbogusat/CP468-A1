@@ -5,12 +5,12 @@ class State:
 
     def __init__(self, missi_left, carni_left,
                 missi_right, carni_right, boat_pos, path_taken):
-         self.missi_left = missi_left
-         self.carni_left = carni_left
-         self.missi_right = missi_right
-         self.carni_right = carni_right
-         self.boat_pos = boat_pos
-         self.path_taken = path_taken
+        self.missi_left = missi_left
+        self.carni_left = carni_left
+        self.missi_right = missi_right
+        self.carni_right = carni_right
+        self.boat_pos = boat_pos
+        self.path_taken = path_taken
 
     def is_success(self):
         # Success if all have been moved to right side
@@ -30,7 +30,7 @@ class State:
 
         return True
 
-    def __eq__(self,other):
+    def __eq__(self, other):
         if(self.missi_left == other.missi_left and self.missi_right == other.missi_right
         and self.carni_left == other.carni_left and self.carni_right == other.carni_right
         and self.boat_pos == other.boat_pos):
@@ -54,7 +54,7 @@ class State:
         return None
 
 
-def move_one(cur_state,who):
+def move_one(cur_state, who):
     cur_state.path_taken.append(cur_state)
     if cur_state.boat_pos == "left":
         if who == "missi":
@@ -81,7 +81,7 @@ def move_one(cur_state,who):
     return new_state
 
 
-def move_two(cur_state,who1,who2):
+def move_two(cur_state, who1, who2):
     cur_state.path_taken.append(cur_state)
     new_boat_pos = ""
     sent = [0,0]
