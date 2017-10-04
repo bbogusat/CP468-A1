@@ -1,10 +1,11 @@
 import copy
 import collections
 
+
 class State:
 
     def __init__(self, missi_left, carni_left,
-                missi_right, carni_right, boat_pos, path_taken):
+                 missi_right, carni_right, boat_pos, path_taken):
         self.missi_left = missi_left
         self.carni_left = carni_left
         self.missi_right = missi_right
@@ -32,20 +33,22 @@ class State:
 
     def __eq__(self, other):
         if(self.missi_left == other.missi_left and self.missi_right == other.missi_right
-        and self.carni_left == other.carni_left and self.carni_right == other.carni_right
-        and self.boat_pos == other.boat_pos):
+           and self.carni_left == other.carni_left and self.carni_right == other.carni_right
+           and self.boat_pos == other.boat_pos):
             return True
         return False
 
     def print_state(self):
-        print("Left: "+str(self.missi_left)+"M , " +str(self.carni_left)+
-        "C\nRight: "+str(self.missi_right)+"M , " +str(self.carni_right)+"C"
-        +" boat pos: "+self.boat_pos+ "\n")
+        print("Left: " + str(self.missi_left) + "M , " + str(self.carni_left) +
+              "C\nRight: " + str(self.missi_right) + "M , " +
+              str(self.carni_right) + "C"
+              + " boat pos: " + self.boat_pos + "\n")
 
     def to_string(self):
-        state_def = str("Left: "+str(self.missi_left)+"M , " +str(self.carni_left)+
-        "C\nRight: "+str(self.missi_right)+"M , " +str(self.carni_right)+"C"
-        +" boat pos: "+self.boat_pos+ "\n")
+        state_def = str("Left: " + str(self.missi_left) + "M , " + str(self.carni_left) +
+                        "C\nRight: " + str(self.missi_right) +
+                        "M , " + str(self.carni_right) + "C"
+                        + " boat pos: " + self.boat_pos + "\n")
         return state_def
 
     def get_path(self):
@@ -58,25 +61,25 @@ def move_one(cur_state, who):
     cur_state.path_taken.append(cur_state)
     if cur_state.boat_pos == "left":
         if who == "missi":
-            new_state = State(cur_state.missi_left-1,cur_state.carni_left,
-                                cur_state.missi_right+1,cur_state.carni_right,
-                                "right",cur_state.path_taken)
+            new_state = State(cur_state.missi_left - 1, cur_state.carni_left,
+                              cur_state.missi_right + 1, cur_state.carni_right,
+                              "right", cur_state.path_taken)
             print("Sent 1M right")
         else:
-            new_state = State(cur_state.missi_left,cur_state.carni_left-1,
-                                cur_state.missi_right,cur_state.carni_right+1,
-                                "right",cur_state.path_taken)
+            new_state = State(cur_state.missi_left, cur_state.carni_left - 1,
+                              cur_state.missi_right, cur_state.carni_right + 1,
+                              "right", cur_state.path_taken)
             print("Sent 1C right")
     else:
         if who == "missi":
-            new_state = State(cur_state.missi_left+1,cur_state.carni_left,
-                                cur_state.missi_right-1,cur_state.carni_right,
-                                "left",cur_state.path_taken)
+            new_state = State(cur_state.missi_left + 1, cur_state.carni_left,
+                              cur_state.missi_right - 1, cur_state.carni_right,
+                              "left", cur_state.path_taken)
             print("Sent 1M left")
         else:
-            new_state = State(cur_state.missi_left,cur_state.carni_left+1,
-                                cur_state.missi_right,cur_state.carni_right-1,
-                                "left",cur_state.path_taken)
+            new_state = State(cur_state.missi_left, cur_state.carni_left + 1,
+                              cur_state.missi_right, cur_state.carni_right - 1,
+                              "left", cur_state.path_taken)
             print("Sent 1C left")
     return new_state
 
@@ -84,60 +87,62 @@ def move_one(cur_state, who):
 def move_two(cur_state, who1, who2):
     cur_state.path_taken.append(cur_state)
     new_boat_pos = ""
-    sent = [0,0]
+    sent = [0, 0]
     if cur_state.boat_pos == "left":
         new_boat_pos = "right"
         if who1 == "missi":
-            new_state = State(cur_state.missi_left-1,cur_state.carni_left,
-                                cur_state.missi_right+1,cur_state.carni_right,
-                                new_boat_pos,cur_state.path_taken)
+            new_state = State(cur_state.missi_left - 1, cur_state.carni_left,
+                              cur_state.missi_right + 1, cur_state.carni_right,
+                              new_boat_pos, cur_state.path_taken)
             sent[0] += 1
         else:
-            new_state = State(cur_state.missi_left,cur_state.carni_left-1,
-                                cur_state.missi_right,cur_state.carni_right+1,
-                                new_boat_pos,cur_state.path_taken)
+            new_state = State(cur_state.missi_left, cur_state.carni_left - 1,
+                              cur_state.missi_right, cur_state.carni_right + 1,
+                              new_boat_pos, cur_state.path_taken)
             sent[1] += 1
 
         if who2 == "missi":
-            new_state = State(new_state.missi_left-1,new_state.carni_left,
-                                new_state.missi_right+1,new_state.carni_right,
-                                new_boat_pos,cur_state.path_taken)
+            new_state = State(new_state.missi_left - 1, new_state.carni_left,
+                              new_state.missi_right + 1, new_state.carni_right,
+                              new_boat_pos, cur_state.path_taken)
             sent[0] += 1
         else:
-            new_state = State(new_state.missi_left,new_state.carni_left-1,
-                                new_state.missi_right,new_state.carni_right+1,
-                                new_boat_pos,cur_state.path_taken)
+            new_state = State(new_state.missi_left, new_state.carni_left - 1,
+                              new_state.missi_right, new_state.carni_right + 1,
+                              new_boat_pos, cur_state.path_taken)
             sent[1] += 1
     else:
         new_boat_pos = "left"
         if who1 == "missi":
-            new_state = State(cur_state.missi_left+1,cur_state.carni_left,
-                                cur_state.missi_right-1,cur_state.carni_right,
-                                new_boat_pos,cur_state.path_taken)
+            new_state = State(cur_state.missi_left + 1, cur_state.carni_left,
+                              cur_state.missi_right - 1, cur_state.carni_right,
+                              new_boat_pos, cur_state.path_taken)
             sent[0] += 1
         else:
-            new_state = State(cur_state.missi_left,cur_state.carni_left+1,
-                                cur_state.missi_right,cur_state.carni_right-1,
-                                new_boat_pos,cur_state.path_taken)
+            new_state = State(cur_state.missi_left, cur_state.carni_left + 1,
+                              cur_state.missi_right, cur_state.carni_right - 1,
+                              new_boat_pos, cur_state.path_taken)
             sent[1] += 1
 
         if who2 == "missi":
-            new_state = State(new_state.missi_left+1,new_state.carni_left,
-                                new_state.missi_right-1,new_state.carni_right,
-                                new_boat_pos,cur_state.path_taken)
+            new_state = State(new_state.missi_left + 1, new_state.carni_left,
+                              new_state.missi_right - 1, new_state.carni_right,
+                              new_boat_pos, cur_state.path_taken)
             sent[0] += 1
         else:
-            new_state = State(new_state.missi_left,new_state.carni_left+1,
-                                new_state.missi_right,new_state.carni_right-1,
-                                new_boat_pos,cur_state.path_taken)
+            new_state = State(new_state.missi_left, new_state.carni_left + 1,
+                              new_state.missi_right, new_state.carni_right - 1,
+                              new_boat_pos, cur_state.path_taken)
             sent[1] += 1
 
-    print("Sent "+str(sent[0])+"M , "+ str(sent[1])+"C - " +new_boat_pos)
+    print("Sent " + str(sent[0]) + "M , " +
+          str(sent[1]) + "C - " + new_boat_pos)
 
     return new_state
 
+
 def solve(cur_state, explored):
-    #Moving when unable. need to make sure there are people there to move
+    # Moving when unable. need to make sure there are people there to move
     if cur_state.is_success():
         # No need to explore further the conditions are met
         cur_state.path_taken.append(cur_state)
@@ -150,14 +155,19 @@ def solve(cur_state, explored):
     explored.append(cur_state)
 
     # Will return explored on success, will return the next node if not
-    path1 = solve(move_one(copy.deepcopy(cur_state),"missi"),copy.deepcopy(explored))
-    path2 = solve(move_one(copy.deepcopy(cur_state),"carni"),copy.deepcopy(explored))
-    path3 = solve(move_two(copy.deepcopy(cur_state),"missi","missi"),copy.deepcopy(explored))
-    path4 = solve(move_two(copy.deepcopy(cur_state),"missi","carni"),copy.deepcopy(explored))
-    path5 = solve(move_two(copy.deepcopy(cur_state),"carni","carni"),copy.deepcopy(explored))
+    path1 = solve(move_one(copy.deepcopy(cur_state),
+                           "missi"), copy.deepcopy(explored))
+    path2 = solve(move_one(copy.deepcopy(cur_state),
+                           "carni"), copy.deepcopy(explored))
+    path3 = solve(move_two(copy.deepcopy(cur_state),
+                           "missi", "missi"), copy.deepcopy(explored))
+    path4 = solve(move_two(copy.deepcopy(cur_state),
+                           "missi", "carni"), copy.deepcopy(explored))
+    path5 = solve(move_two(copy.deepcopy(cur_state),
+                           "carni", "carni"), copy.deepcopy(explored))
 
-    #Path 1 holds the next state.
-    paths = [path1,path2,path3,path4,path5]
+    # Path 1 holds the next state.
+    paths = [path1, path2, path3, path4, path5]
     good_paths = []
     for path in paths:
         if path is not None:
@@ -176,14 +186,15 @@ def solve(cur_state, explored):
 
 
 def main():
-    initial_state = State(3,3,0,0,"left",[])
+    initial_state = State(3, 3, 0, 0, "left", [])
     explored = []
     print("Solving . . . \n")
-    results = solve(initial_state,explored)
+    results = solve(initial_state, explored)
 
     count = 1
     for res in results:
-        print("\nSolution #"+str(count)+":\n----------------------------------")
+        print("\nSolution #" + str(count) +
+              ":\n----------------------------------")
         res.get_path()
         count += 1
 
