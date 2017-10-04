@@ -15,18 +15,18 @@ class State:
 
     def is_success(self):
         # Success if all have been moved to right side
-        if self.missi_left == 0 and self.carni_left == 0 and self.missi_right > 0 and self.carni_right > 0:
+        if (self.missi_left == 0 and self.carni_left == 0 and self.missi_right > 0 and self.carni_right > 0):
             return True
         else:
             return False
 
     def valid_state(self):
         # Check for missi's being outnumbered
-        if self.missi_left > 0 and self.missi_left < self.carni_left:
+        if (self.missi_left > 0 and self.missi_left < self.carni_left):
             return False
-        if self.missi_right > 0 and self.missi_right < self.carni_right:
+        if (self.missi_right > 0 and self.missi_right < self.carni_right):
             return False
-        if self.missi_right < 0 or self.missi_left < 0 or self.carni_right < 0 or self.carni_left < 0:
+        if (self.missi_right < 0 or self.missi_left < 0 or self.carni_right < 0 or self.carni_left < 0):
             return False
 
         return True
@@ -51,13 +51,14 @@ class State:
                         + " boat pos: " + self.boat_pos + "\n")
         return state_def
 
-    def get_path(self):
+    def print_path(self):
         for nodes in self.path_taken:
             print(nodes.to_string())
         return None
 
 
 def move_one(cur_state, who):
+    # Updates the path taken
     cur_state.path_taken.append(cur_state)
     if cur_state.boat_pos == "left":
         if who == "missi":
@@ -85,6 +86,7 @@ def move_one(cur_state, who):
 
 
 def move_two(cur_state, who1, who2):
+    # Updates the path taken
     cur_state.path_taken.append(cur_state)
     new_boat_pos = ""
     sent = [0, 0]
@@ -147,38 +149,41 @@ def solve(cur_state, explored):
         # No need to explore further the conditions are met
         cur_state.path_taken.append(cur_state)
         return cur_state
+
     cur_state.print_state()
+
     if not cur_state.valid_state() or cur_state in explored:
-        # If the state isn't valid (invalid move) then move up a node.
+        # If the state isn't valid (invalid move) then move up a level.
         return None
 
     explored.append(cur_state)
 
-    # Will return explored on success, will return the next node if not
-    path1 = solve(move_one(copy.deepcopy(cur_state),
-                           "missi"), copy.deepcopy(explored))
-    path2 = solve(move_one(copy.deepcopy(cur_state),
-                           "carni"), copy.deepcopy(explored))
-    path3 = solve(move_two(copy.deepcopy(cur_state),
-                           "missi", "missi"), copy.deepcopy(explored))
-    path4 = solve(move_two(copy.deepcopy(cur_state),
-                           "missi", "carni"), copy.deepcopy(explored))
-    path5 = solve(move_two(copy.deepcopy(cur_state),
-                           "carni", "carni"), copy.deepcopy(explored))
+    # Will return the success state with the path on success
+    # Returns nothing on failure
+    branch1 = solve(move_one(copy.deepcopy(cur_state),
+                             "missi"), copy.deepcopy(explored))
+    branch2 = solve(move_one(copy.deepcopy(cur_state),
+                             "carni"), copy.deepcopy(explored))
+    branch3 = solve(move_two(copy.deepcopy(cur_state),
+                             "missi", "missi"), copy.deepcopy(explored))
+    branch4 = solve(move_two(copy.deepcopy(cur_state),
+                             "missi", "carni"), copy.deepcopy(explored))
+    branch5 = solve(move_two(copy.deepcopy(cur_state),
+                             "carni", "carni"), copy.deepcopy(explored))
 
-    # Path 1 holds the next state.
-    paths = [path1, path2, path3, path4, path5]
+    paths = [branch1, branch2, branch3, branch4, branch5]
     good_paths = []
     for path in paths:
         if path is not None:
-            # If success return current state.
+            # If it is the success node create an inital good path list
             if type(path) is not list:
-                # Append current state
                 good_paths.append(path)
             else:
+                # If it isn't the initial success node, append to good path list
                 for p in path:
                     good_paths.append(p)
 
+    # If there are no good paths then it cannot be solved. return None
     if len(good_paths) == 0:
         return None
 
@@ -195,7 +200,7 @@ def main():
     for res in results:
         print("\nSolution #" + str(count) +
               ":\n----------------------------------")
-        res.get_path()
+        res.print_path()
         count += 1
 
 
