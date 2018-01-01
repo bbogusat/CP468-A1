@@ -195,13 +195,16 @@ def main():
     explored = []
     print("Solving . . . \n")
     results = solve(initial_state, explored)
-
+    
     count = 1
-    for res in results:
-        print("\nSolution #" + str(count) +
-              ":\n----------------------------------")
-        res.print_path()
-        count += 1
+    if(results is None):
+        print("There is no found solution.")
+    else:
+        for res in results:
+            print("\nSolution #" + str(count) + 
+                  ":\n----------------------------------")
+            res.print_path()
+            count += 1
 
 
 if __name__ == "__main__":
